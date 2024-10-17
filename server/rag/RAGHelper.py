@@ -1,4 +1,6 @@
 import os
+import shutil
+
 from tqdm import tqdm
 import hashlib
 
@@ -207,6 +209,9 @@ class RAGHelper:
                     persist_directory=persist_directory,
                     collection_name=os.getenv("vector_store_collection"),
                 )
+
+                if os.path.exists(persist_directory):
+                    shutil.rmtree(persist_directory)
 
                 # Add the documents 1 by 1 so we can track progress
                 with tqdm(total=len(self.chunked_documents), desc="Vectorizing documents") as pbar:
