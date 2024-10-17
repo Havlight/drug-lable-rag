@@ -6,6 +6,7 @@ from accounts.db import User, create_db_and_tables
 from accounts.schemas import UserCreate, UserRead, UserUpdate
 from accounts.users import auth_backend, current_active_user, fastapi_users
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
 
 from pydantic import BaseModel
 import logging
@@ -34,6 +35,19 @@ app = FastAPI(lifespan=lifespan)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+# Define CORS settings
+origins = ["*"]  # Allow requests from any origin
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
+
 app.include_router(
     fastapi_users.get_auth_router(auth_backend), prefix="/auth/jwt", tags=["auth"]
 )
@@ -57,11 +71,6 @@ app.include_router(
     prefix="/users",
     tags=["users"],
 )
-
-
-@app.get("/authenticated-route")
-async def authenticated_route(user: User = Depends(current_active_user)):
-    return {"message": f"Hello {user.email}!"}
 
 
 # Disable parallelism in tokenizers to avoid warnings
