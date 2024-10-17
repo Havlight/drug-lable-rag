@@ -332,7 +332,7 @@ class RAGHelperCloud(RAGHelper):
 
         invalid_chars = r'<>:"/\|?*'
         valid_filename = re.sub(f"[{re.escape(invalid_chars)}]", "_",
-                                os.getenv('vector_store_uri'))
+                                os.getenv('vector_store'))
         # Store these too, for our sparse DB
         with open(f"{valid_filename}_sparse.pickle", 'wb') as f:
             pickle.dump(self.chunked_documents, f)
