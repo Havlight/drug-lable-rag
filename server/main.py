@@ -7,7 +7,7 @@ from accounts.schemas import UserCreate, UserRead, UserUpdate
 from accounts.users import auth_backend, current_active_user, fastapi_users
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-
+from middleware import TimeoutMiddleware
 from pydantic import BaseModel
 import logging
 import os
@@ -35,6 +35,7 @@ app = FastAPI(lifespan=lifespan)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+app.add_middleware(TimeoutMiddleware, timeout=120)
 
 # Define CORS settings
 origins = ["*"]  # Allow requests from any origin
