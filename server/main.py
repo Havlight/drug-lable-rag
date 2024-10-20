@@ -36,7 +36,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app.add_middleware(TimeoutMiddleware, timeout=120)
-
+# 頭痛吃什麼藥?
 # Define CORS settings
 origins = ["*"]  # Allow requests from any origin
 
