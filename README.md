@@ -26,9 +26,8 @@ pip install -r requirements.txt
 ```
 Then run the server using `python main.py` or `fastapi run` from the server subfolder.
 
-there is a test account:
-username:`user@gmail.com`
-password:`1111`
+there is a test account:  
+: username:`user@gmail.com` password:`1111`
 ## configuration
 #### there is a chinese version of `.env` if you wanna use
 you can add your api key in `rag/.env`
