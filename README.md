@@ -17,7 +17,7 @@ Also this project will only support postgres
 # accelerate==0.34.0
 ```
 and uncomment provenance.py and RAGHelper.py in the section about provenance
-#### make sure you have chroma and data folder under server/rag
+**make sure you have chroma and data folder under server/rag**
 #### run the project(better create virtual environment)
 ```bash
 git clone https://github.com/Havlight/drug-lable-rag.git
@@ -25,8 +25,12 @@ cd server
 pip install -r requirements.txt
 ```
 Then run the server using `python main.py` or `fastapi run` from the server subfolder.
+
+there is a test account:  
+>username:`user@gmail.com`
+>password:`1111`
 ## configuration
-#### there is a chinese version of `.env` if you wanna use
+**there is a chinese version of `.env` if you wanna use**
 you can add your api key in `rag/.env`
 ```bash
 GOOGLE_API_KEY=put_your_key-fqxkE4Y
