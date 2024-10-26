@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 
 from tqdm import tqdm
@@ -38,6 +39,16 @@ def formatDocuments(docs):
         doc_strings.append(f"Document {i} content: {doc.page_content}\nDocument {i} metadata: {metadata_string}")
     return "\n\n<NEWDOC>\n\n".join(doc_strings)
 
+def extract_source(filename):
+    # 移除路徑和文件擴展名
+    base_name = filename.split("\\")[-1].replace('.md', '')
+
+    # 使用正則表達式分割文件名
+    parts = re.split(r'[\-]', base_name)
+
+    # 過濾掉空字符串
+    parts = [part.strip() for part in parts if part.strip()]
+    return " ".join(parts)
 
 class RAGHelper:
     # Loads the data and chunks it into an ensemble retriever
@@ -155,28 +166,44 @@ class RAGHelper:
                 docs = docs + newdocs
 
             if os.getenv('splitter') == 'RecursiveCharacterTextSplitter':
-                self.text_splitter = RecursiveCharacterTextSplitter(
-                    chunk_size=int(os.getenv('chunk_size')),
-                    chunk_overlap=int(os.getenv('chunk_overlap')),
-                    length_function=len,
-                    keep_separator=True,
-                    separators=[
-                        "\n \n",
-                        "\n\n",
-                        "\n",
-                        ".",
-                        "!",
-                        "?",
-                        " ",
-                        ",",
-                        "\u200b",  # Zero-width space
-                        "\uff0c",  # Fullwidth comma
-                        "\u3001",  # Ideographic comma
-                        "\uff0e",  # Fullwidth full stop
-                        "\u3002",  # Ideographic full stop
-                        "",
-                    ],
-                )
+                if os.getenv("use_blank_line_as_separator") == "True":
+                    self.text_splitter = RecursiveCharacterTextSplitter(
+                        chunk_size=int(os.getenv('chunk_size')),
+                        chunk_overlap=int(os.getenv('chunk_overlap')),
+                        length_function=len,
+                        keep_separator=True,
+                        separators=[
+                            r'\n\s*\n',
+                            r"\n \n",
+                            r"\n\n",
+                            r"\n",
+                            r" ",
+                        ],
+                        is_separator_regex=True
+                    )
+                else:
+                    self.text_splitter = RecursiveCharacterTextSplitter(
+                        chunk_size=int(os.getenv('chunk_size')),
+                        chunk_overlap=int(os.getenv('chunk_overlap')),
+                        length_function=len,
+                        keep_separator=True,
+                        separators=[
+                            "\n \n",
+                            "\n\n",
+                            "\n",
+                            ".",
+                            "!",
+                            "?",
+                            " ",
+                            ",",
+                            "\u200b",  # Zero-width space
+                            "\uff0c",  # Fullwidth comma
+                            "\u3001",  # Ideographic comma
+                            "\uff0e",  # Fullwidth full stop
+                            "\u3002",  # Ideographic full stop
+                            "",
+                        ],
+                    )
             elif os.getenv('splitter') == 'SemanticChunker':
                 breakpoint_threshold_amount = None
                 number_of_chunks = None
@@ -191,9 +218,9 @@ class RAGHelper:
                     number_of_chunks=number_of_chunks
                 )
 
-            # Add a hash as ID to each document chunk's metadata
+            # Add a hash as ID to each document chunk's metadata and source to content
             self.chunked_documents = [
-                Document(page_content=doc.page_content,
+                Document(page_content=extract_source(doc.metadata['source'])+doc.page_content,
                          metadata={**doc.metadata, 'id': hashlib.md5(doc.page_content.encode()).hexdigest()})
                 for doc in self.text_splitter.split_documents(docs)
             ]
@@ -209,9 +236,6 @@ class RAGHelper:
                     persist_directory=persist_directory,
                     collection_name=os.getenv("vector_store_collection"),
                 )
-
-                # if os.path.exists(persist_directory):
-                #     shutil.rmtree(persist_directory)
 
                 # Add the documents 1 by 1 so we can track progress
                 with tqdm(total=len(self.chunked_documents), desc="Vectorizing documents") as pbar:
@@ -233,7 +257,7 @@ class RAGHelper:
             )
         else:
             raise Exception(
-                "Only chroma are supported as vector stores! Please set vector_store in your .env.postgres file.")
+                "Only chroma are supported as vector stores! Please set vector_store in your .env.en.postgres file.")
 
         # Set up the vector retriever
         retriever = self.db.as_retriever(
