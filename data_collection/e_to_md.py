@@ -170,7 +170,7 @@ def main():
         if mode == '1':
             try:
                 start = int(input("請輸入起始代碼: "))
-                end = start + 500
+                end = int(input("請輸入結束代碼: "))
                 # delay = float(input("請輸入每次抓取的延遲時間（秒）: "))
                 delay = 0.2
 
