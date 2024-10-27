@@ -161,10 +161,12 @@ def main():
         print("選擇操作模式：")
         print("1. 範圍抓取")
         print("2. 單次抓取")
-        mode = '1'
+        mode = input("請輸入選擇 (1 或 2): ")
+
         print("選擇仿單證別")
         print(options)
-        category = 1
+        category = int(input("請輸入一個數字 (1-27): "))
+
         if mode == '1':
             try:
                 start = int(input("請輸入起始代碼: "))
