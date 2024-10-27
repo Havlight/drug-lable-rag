@@ -23,15 +23,23 @@ def scrape_one_page(code: str, management: str | None):
     folder_name = "電子仿單"
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    # 發送請求並解析 HTML
-    url = f"https://mcp.fda.gov.tw/im_detail_1/{management}字第{code}號/"
-    try:
-        print("正在爬取: " + url)
-        response = requests.get(url)
-    except requests.exceptions.Timeout:
-        print("Timed out")
 
-    if response.url == "https://mcp.fda.gov.tw/im":
+    url = f"https://mcp.fda.gov.tw/im_detail_1/{management}字第{code}號/"
+    max_retries = 3
+    response = None  # 初始化response
+
+    for attempt in range(max_retries):
+        try:
+            print("正在爬取: " + url)
+            response = requests.get(url, timeout=10)
+            break  # 若請求成功，跳出重試迴圈
+        except requests.exceptions.Timeout:
+            print(f"Timeout on attempt {attempt + 1}/{max_retries}")
+            if attempt == max_retries - 1:
+                print("已達最大重試次數，放棄此次爬取。")
+                return
+
+    if response and response.url == "https://mcp.fda.gov.tw/im":
         print("查無此仿單資料")
         return
 
@@ -54,18 +62,15 @@ def scrape_one_page(code: str, management: str | None):
         html_text = "".join(
             [etree.tostring(element, encoding='unicode') for element in elements])
         markdown_content = md(html_text).replace("\xa0", " ").strip()
-        # 清除 | | |+ 後 清除blank lines
         cleaned_markdown = re.sub(r'^\|\s*\|(\s*\|)+$', "", markdown_content, flags=re.MULTILINE)
         cleaned_markdown = re.sub(r"\n\s*\n", "\n", cleaned_markdown)
         matches = list(re.finditer(r'\n(\|\s*---\s*)+', cleaned_markdown))
         result = cleaned_markdown
-        # 遍歷所有匹配部分，從最後一個匹配開始，替換後續匹配為空字符串
-        for i in range(len(matches) - 1, 0, -1):  # 跳過第一個匹配
+        for i in range(len(matches) - 1, 0, -1):
             match = matches[i]
             start, end = match.span()
             result = result[:start] + '' + result[end:]
         cleaned_markdown = result
-
         info_dict[key] = cleaned_markdown
 
     # 提取 XPath 結果
@@ -106,9 +111,9 @@ def scrape_one_page(code: str, management: str | None):
             text = re.split(r'[\n。]', value)[0]
             cleaned_text = re.sub(r'[ \|\-]', '', text)[:40]
             file_name = f"{code}-{zh_name}-{cleaned_text}.md"
+            file_name = sanitize_filename(file_name)
             break
 
-    # 使用中文品名作為 Markdown 檔名
     file_path = os.path.join(folder_name, management, file_name)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     # 儲存 Markdown 檔案
@@ -156,17 +161,16 @@ def main():
         print("選擇操作模式：")
         print("1. 範圍抓取")
         print("2. 單次抓取")
-        mode = input("請輸入選擇 (1 或 2): ")
-
+        mode = '1'
         print("選擇仿單證別")
         print(options)
-        category = int(input("請輸入一個數字 (1-27): "))
-
+        category = 1
         if mode == '1':
             try:
                 start = int(input("請輸入起始代碼: "))
-                end = int(input("請輸入結束代碼: "))
-                delay = float(input("請輸入每次抓取的延遲時間（秒）: "))
+                end = start + 500
+                # delay = float(input("請輸入每次抓取的延遲時間（秒）: "))
+                delay = 0.2
 
                 for i in range(start, end + 1):
                     code = f'{i:06d}'  # 將數字格式化為六位數
@@ -183,7 +187,6 @@ def main():
         else:
             print("無效的選擇，請輸入1或2。")
 
-        # 允許使用者決定是否繼續
         continue_choice = input("是否繼續操作? (y/n): ").lower()
         if continue_choice != 'y':
             break
