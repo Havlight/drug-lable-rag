@@ -1,6 +1,5 @@
 import os
 import re
-import shutil
 
 from tqdm import tqdm
 import hashlib
@@ -39,6 +38,7 @@ def formatDocuments(docs):
         doc_strings.append(f"Document {i} content: {doc.page_content}\nDocument {i} metadata: {metadata_string}")
     return "\n\n<NEWDOC>\n\n".join(doc_strings)
 
+
 def extract_source(filename):
     # 移除路徑和文件擴展名
     base_name = filename.split("\\")[-1].replace('.md', '')
@@ -49,6 +49,7 @@ def extract_source(filename):
     # 過濾掉空字符串
     parts = [part.strip() for part in parts if part.strip()]
     return " ".join(parts)
+
 
 class RAGHelper:
     # Loads the data and chunks it into an ensemble retriever
@@ -220,7 +221,7 @@ class RAGHelper:
 
             # Add a hash as ID to each document chunk's metadata and source to content
             self.chunked_documents = [
-                Document(page_content=extract_source(doc.metadata['source'])+doc.page_content,
+                Document(page_content=extract_source(doc.metadata['source']) + doc.page_content,
                          metadata={**doc.metadata, 'id': hashlib.md5(doc.page_content.encode()).hexdigest()})
                 for doc in self.text_splitter.split_documents(docs)
             ]
@@ -272,7 +273,8 @@ class RAGHelper:
         self.rerank_retriever = None
         if os.getenv("rerank") == "True":
             if os.getenv("rerank_model") == "flashrank":
-                self.compressor = FlashrankRerank(top_n=int(os.getenv("rerank_k")))
+                model_name = os.getenv("flashrank_model", None)
+                self.compressor = FlashrankRerank(top_n=int(os.getenv("rerank_k")), model=model_name)
             else:
                 self.compressor = ScoredCrossEncoderReranker(
                     model=HuggingFaceCrossEncoder(model_name=os.getenv("rerank_model")),
@@ -282,6 +284,7 @@ class RAGHelper:
             self.rerank_retriever = ContextualCompressionRetriever(
                 base_compressor=self.compressor, base_retriever=self.ensemble_retriever
             )
+
     # no use
     def addDocument(self, filename):
         if filename.lower().endswith('pdf'):

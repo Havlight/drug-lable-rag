@@ -295,7 +295,9 @@ class RAGHelperCloud(RAGHelper):
                 chunk_overlap=int(os.getenv('chunk_overlap')),
                 length_function=len,
                 keep_separator=True,
+                is_separator_regex=True,
                 separators=[
+                    r'\n\s*\n',
                     "\n \n",
                     "\n\n",
                     "\n",
@@ -354,7 +356,8 @@ class RAGHelperCloud(RAGHelper):
 
         if os.getenv("rerank") == "True":
             if os.getenv("rerank_model") == "flashrank":
-                self.compressor = FlashrankRerank(top_n=int(os.getenv("rerank_k")))
+                self.compressor = FlashrankRerank(top_n=int(os.getenv("rerank_k")),
+                                                  model=os.getenv("flashrank_model", None))
             else:
                 self.compressor = ScoredCrossEncoderReranker(
                     model=HuggingFaceCrossEncoder(model_name=os.getenv("rerank_model")),
