@@ -17,9 +17,15 @@ parser = LlamaParse(
     language="ch_tra"
 )
 headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-    'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7', 'Accept-Encoding': 'gzip, deflate, br, zstd',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'}
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Cache-Control': 'max-age=0', 'Connection': 'keep-alive',
+    'Cookie': 'cookiesession1=678A3E2FDEC3E9D96B6BDAFF54CE28B3; _fbp=fb.2.1725893924336.163223500242532563; _gcl_au=1.1.524196221.1725893924; _ga=GA1.1.540091657.1725893924; _ga_BTVCPC2Y8B=GS1.1.1729603296.11.1.1729604941.56.0.27639610; _ga_8CBFE781ED=GS1.1.1730024299.7.1.1730025135.25.0.0; __RequestVerificationToken=GNYQpe2hyyNTNuKIAm08hIbf5NSIVydDZ3PcAeGdyAHkMrl9n1pN8MYtrHniQlSV3NfW46N1dLKvCuZoJQnyr-IRTYF_w_xh0FJQVKymnl81; ASP.NET_SessionId=hxghv4wynbdymhew3f5ff4c5',
+    'Host': 'mcp.fda.gov.tw', 'Referer': 'https://mcp.fda.gov.tw/im',
+    'sec-ch-ua': '"Chromium";v="130", "Google Chrome";v="130", "Not A Brand";v="99"', 'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"', 'Sec-Fetch-Dest': 'document', 'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-User': '?1', 'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'}
 
 
 def process_document_text(doc_text):
@@ -87,23 +93,6 @@ def scrape_one_page(code: str, management: str):
         print("藥品已註銷")
         return
 
-        # 構建 Markdown 內容
-    markdown_content = f"""
-## 中文品名
-{zh_name}
-## 英文品名
-{en_name}
-## 許可證號
-{code}
-## 藥品類別
-{category}
-## 劑型
-{type_}
-## 有效日期
-{expire_date}
-## 申請商地址
-{compony}
-"""
     # 使用XPath找到PDF的<a>標籤的href屬性
     pdf_relative_url = html.xpath("//a[contains(text(), '.pdf')]/@href")
 
@@ -122,7 +111,7 @@ def scrape_one_page(code: str, management: str):
     # Step 4: 下載PDF文件
     pdf_responses = []
     for u in pdf_url:
-        pdf_responses.append(requests.get(u, stream=True))
+        pdf_responses.append(requests.get(u, stream=True,headers=headers))
 
     idx = find_first_text_pdf_position(pdf_responses)
     # 寫入pdf 若有文字則寫入 否則 寫入最後的
@@ -160,8 +149,8 @@ def scrape_one_page_retry(code, max_retry, management):
     retry_count = 0
     while retry_count < max_retries:
         try:
-            scrape_one_page(code, management)
-            return
+            succ = scrape_one_page(code, management)
+            return succ
         except Exception as e:
             retry_count += 1
             print(e)
