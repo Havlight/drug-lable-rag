@@ -103,9 +103,9 @@ def scrape_one_page(code: str, management: str):
     # 使用XPath找到PDF的<a>標籤的href屬性
     pdf_relative_url = html.xpath("//a[contains(text(), '.pdf')]/@href")
 
-    # if not pdf_relative_url:
-    #     print("PDF 文件未找到")
-    #     return
+    if not pdf_relative_url:
+        print("PDF 文件未找到")
+        return
 
     # Step 3: 完整PDF的URL
     base_url = "https://mcp.fda.gov.tw"
