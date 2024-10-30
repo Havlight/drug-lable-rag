@@ -2,3 +2,4 @@ llama-parse
 fitz
 pathvalidate
 markdownify
+pymupdf
