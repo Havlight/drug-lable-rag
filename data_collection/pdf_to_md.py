@@ -79,6 +79,7 @@ def scrape_one_page(code: str, management: str):
     category_xpath = "//label[text()='藥品類別']/following-sibling::span[1]/text()"
     type_xpath = "//label[text()='劑型']/following-sibling::span[1]/text()"
     compony_xpath = "//label[text()='申請商地址']/following-sibling::span[1]/text()"
+    expire_status_xpath = "//label[text()='註銷狀態']/following-sibling::span[1]/text()"
     expire_date_xpath = "normalize-space(//label[text()='有效日期']/following-sibling::span[1]/text())"
     # 提取 XPath 結果
     zh_name = sanitize_filename(''.join(html.xpath(zh_name_xpath)).strip())
@@ -87,11 +88,12 @@ def scrape_one_page(code: str, management: str):
     category = ''.join(html.xpath(category_xpath)).strip()
     type_ = ''.join(html.xpath(type_xpath)).strip()
     compony = ''.join(html.xpath(compony_xpath)).strip()
+    expire_status = ''.join(html.xpath(expire_status_xpath)).strip()
     expire_date = ''.join(html.xpath(expire_date_xpath)).strip()
 
-    if expire_date.find("已註銷") != -1:
+    if expire_status.find("已註銷") != -1:
         print("藥品已註銷")
-        return
+        return True
 
     # 使用XPath找到PDF的<a>標籤的href屬性
     pdf_relative_url = html.xpath("//a[contains(text(), '.pdf')]/@href")
@@ -111,7 +113,7 @@ def scrape_one_page(code: str, management: str):
     # Step 4: 下載PDF文件
     pdf_responses = []
     for u in pdf_url:
-        pdf_responses.append(requests.get(u, stream=True,headers=headers))
+        pdf_responses.append(requests.get(u, stream=True, headers=headers))
 
     idx = find_first_text_pdf_position(pdf_responses)
     # 寫入pdf 若有文字則寫入 否則 寫入最後的
