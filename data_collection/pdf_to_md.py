@@ -60,7 +60,7 @@ def scrape_one_page(code: str, management: str):
         print("查無此仿單資料")
         return
 
-    content = response.content.decode()
+    content = response.content.decode(errors="ignore")
     html = etree.HTML(content)
     # 定義 XPath
     zh_name_xpath = "//label[text()='中文品名']/following-sibling::span[1]/text()"
@@ -103,9 +103,9 @@ def scrape_one_page(code: str, management: str):
     # 使用XPath找到PDF的<a>標籤的href屬性
     pdf_relative_url = html.xpath("//a[contains(text(), '.pdf')]/@href")
 
-    if not pdf_relative_url:
-        print("PDF 文件未找到")
-        return
+    # if not pdf_relative_url:
+    #     print("PDF 文件未找到")
+    #     return
 
     # Step 3: 完整PDF的URL
     base_url = "https://mcp.fda.gov.tw"
@@ -149,6 +149,7 @@ def scrape_one_page(code: str, management: str):
         new_md_filename = f"{md_file_path.rsplit('.', 1)[0]}-{indication}.md"
         print(f"新檔案名稱: {new_md_filename}")
         os.rename(md_file_path, new_md_filename)
+    return True
 
 
 def scrape_one_page_retry(code, max_retry, management):
@@ -244,7 +245,9 @@ def main():
                 for i in range(start, end + 1):
                     code = f'{i:06d}'  # 將數字格式化為六位數
                     for j in range(1, 5):
-                        scrape_one_page_retry(code, 3, options[j])
+                        succ = scrape_one_page_retry(code, 3, options[j])
+                        if succ:
+                            break
                         time.sleep(delay)  # 延遲抓取
             except ValueError:
                 print("請輸入有效的數字範圍和延遲時間。")
