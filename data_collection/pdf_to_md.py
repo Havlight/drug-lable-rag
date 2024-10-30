@@ -234,6 +234,7 @@ def main():
         print(api_key_pool)
         api_key_index = int(input("請輸入選擇 api key id: "))
         parser.api_key = api_key_pool[api_key_index]
+        print(f"使用api key :{api_key_pool[api_key_index]}")
         if mode == '1':
             try:
                 start = int(input("請輸入起始代碼: "))
@@ -243,8 +244,6 @@ def main():
                 for i in range(start, end + 1):
                     code = f'{i:06d}'  # 將數字格式化為六位數
                     for j in range(1, 5):
-                        print(f"抓取{options[j]}")
-                        print(f"使用api key :{api_key_pool[api_key_index]}")
                         scrape_one_page_retry(code, 3, options[j])
                         time.sleep(delay)  # 延遲抓取
             except ValueError:
