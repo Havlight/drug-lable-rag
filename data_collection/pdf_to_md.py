@@ -216,13 +216,13 @@ options = {
     27: "內衛菌疫輸"
 }
 
-api_key_pool = ['llx-XBf4F270tLIbl2UAuyyOTZWjvmU9G1k2S5uxY2jywdLsQehV',
-                'llx-rySrnLnJmquA3xlx81utLkgDLefVZnP2DnljjQeaZDvwIeuc',
-                'llx-pvxcRA4SWBnryAlnGmD7ceo1b7JMUEaQlFoRlhDi7iYa944Z',
-                'llx-XVBhRFffHqnXbP05qoIR0eQYncBMp6cJLNy1zp7z4MmWJGoh',
-                'llx-VKH8qIJQLHkp7Sa4W2bspEJG6pga9WcBH1eyyTuiiekUVIW8',
-                'llx-ydIQmlGwmwS3De1fVxmnh4hFi4FlOEhPqMXtpetRo75cRAd7',
-                'llx-6JCKqMtIYwut8FwYuBPK0MEMi7ifxCU4njxeswg7CgKFoWav']
+api_key_pool = {1: 'llx-XBf4F270tLIbl2UAuyyOTZWjvmU9G1k2S5uxY2jywdLsQehV',
+                2: 'llx-rySrnLnJmquA3xlx81utLkgDLefVZnP2DnljjQeaZDvwIeuc',
+                3: 'llx-pvxcRA4SWBnryAlnGmD7ceo1b7JMUEaQlFoRlhDi7iYa944Z',
+                4: 'llx-XVBhRFffHqnXbP05qoIR0eQYncBMp6cJLNy1zp7z4MmWJGoh',
+                5: 'llx-VKH8qIJQLHkp7Sa4W2bspEJG6pga9WcBH1eyyTuiiekUVIW8',
+                6: 'llx-ydIQmlGwmwS3De1fVxmnh4hFi4FlOEhPqMXtpetRo75cRAd7',
+                7: 'llx-6JCKqMtIYwut8FwYuBPK0MEMi7ifxCU4njxeswg7CgKFoWav'}
 
 
 def main():
@@ -231,8 +231,9 @@ def main():
         print("1. 範圍抓取")
         print("2. 單次抓取")
         mode = input("請輸入選擇 (1 或 2): ")
-        api_key_index = 0
-        parser.api_key = api_key_pool[0]
+        print(api_key_pool)
+        api_key_index = int(input("請輸入選擇 api key id: "))
+        parser.api_key = api_key_pool[api_key_index]
         if mode == '1':
             try:
                 start = int(input("請輸入起始代碼: "))
@@ -245,10 +246,6 @@ def main():
                         print(f"抓取{options[j]}")
                         print(f"使用api key :{api_key_pool[api_key_index]}")
                         scrape_one_page_retry(code, 3, options[j])
-                        api_key_index += 1
-                        if api_key_index == len(api_key_pool):
-                            api_key_index = 0
-                        parser.api_key = api_key_pool[api_key_index]
                         time.sleep(delay)  # 延遲抓取
             except ValueError:
                 print("請輸入有效的數字範圍和延遲時間。")
