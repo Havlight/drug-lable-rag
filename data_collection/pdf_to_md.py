@@ -16,6 +16,10 @@ parser = LlamaParse(
     verbose=True,
     language="ch_tra"
 )
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+    'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7', 'Accept-Encoding': 'gzip, deflate, br, zstd',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7'}
 
 
 def process_document_text(doc_text):
@@ -49,10 +53,10 @@ def scrape_one_page(code: str, management: str):
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
     # 發送請求並解析 HTML
-    url = f"https://mcp.fda.gov.tw/im_detail_pdf/{management}第{code}號/"
+    url = f"https://mcp.fda.gov.tw/im_detail_pdf/{management}字第{code}號/"
     try:
         print("正在爬取: " + url)
-        response = requests.get(url, timeout=(10, 30), stream=True)
+        response = requests.get(url, timeout=(10, 30), stream=True, headers=headers)
     except requests.exceptions.Timeout:
         print("Timed out")
 
@@ -143,7 +147,6 @@ def scrape_one_page(code: str, management: str):
             # Attempt to extract indication for filename
             if not indication:  # Only try to get indication once
                 indication = extract_indication(processed_text)
-
         # Rename the file after closing it
     if indication:
         new_md_filename = f"{md_file_path.rsplit('.', 1)[0]}-{indication}.md"
