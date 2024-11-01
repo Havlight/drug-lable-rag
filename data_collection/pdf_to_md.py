@@ -20,7 +20,6 @@ headers = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
     'Cache-Control': 'max-age=0', 'Connection': 'keep-alive',
-    'Cookie': 'cookiesession1=678A3E2FDEC3E9D96B6BDAFF54CE28B3; _fbp=fb.2.1725893924336.163223500242532563; _gcl_au=1.1.524196221.1725893924; _ga=GA1.1.540091657.1725893924; _ga_BTVCPC2Y8B=GS1.1.1729603296.11.1.1729604941.56.0.27639610; _ga_8CBFE781ED=GS1.1.1730024299.7.1.1730025135.25.0.0; __RequestVerificationToken=GNYQpe2hyyNTNuKIAm08hIbf5NSIVydDZ3PcAeGdyAHkMrl9n1pN8MYtrHniQlSV3NfW46N1dLKvCuZoJQnyr-IRTYF_w_xh0FJQVKymnl81; ASP.NET_SessionId=hxghv4wynbdymhew3f5ff4c5',
     'Host': 'mcp.fda.gov.tw', 'Referer': 'https://mcp.fda.gov.tw/im',
     'sec-ch-ua': '"Chromium";v="130", "Google Chrome";v="130", "Not A Brand";v="99"', 'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"', 'Sec-Fetch-Dest': 'document', 'Sec-Fetch-Mode': 'navigate',
@@ -66,6 +65,9 @@ def scrape_one_page(code: str, management: str):
     except requests.exceptions.Timeout:
         print("Timed out")
 
+    if response.status_code == 302:
+        print("查無此仿單資料")
+        return
     if response.url == "https://mcp.fda.gov.tw/im":
         print("查無此仿單資料")
         return
@@ -100,7 +102,7 @@ def scrape_one_page(code: str, management: str):
 
     if not pdf_relative_url:
         print("PDF 文件未找到")
-        return
+        return True
 
     # Step 3: 完整PDF的URL
     base_url = "https://mcp.fda.gov.tw"
