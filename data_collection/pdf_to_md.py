@@ -129,6 +129,7 @@ def scrape_one_page(code: str, management: str):
         print(f"無法解析 PDF 文件: {e}")
         return
     # 保存解析後的 Markdown 文件
+    zh_name = sanitize_filename(zh_name)
     md_file_name = f"{code}-{zh_name}.md"
     md_file_path = os.path.join(folder_name, md_file_name)
     indication = None  # Initialize indication to None
@@ -142,6 +143,7 @@ def scrape_one_page(code: str, management: str):
                 indication = extract_indication(processed_text)
         # Rename the file after closing it
     if indication:
+        indication = sanitize_filename(indication.split('。')[0][:40])
         new_md_filename = f"{md_file_path.rsplit('.', 1)[0]}-{indication}.md"
         print(f"新檔案名稱: {new_md_filename}")
         os.rename(md_file_path, new_md_filename)
@@ -219,7 +221,13 @@ api_key_pool = {1: 'llx-XBf4F270tLIbl2UAuyyOTZWjvmU9G1k2S5uxY2jywdLsQehV',
                 4: 'llx-XVBhRFffHqnXbP05qoIR0eQYncBMp6cJLNy1zp7z4MmWJGoh',
                 5: 'llx-VKH8qIJQLHkp7Sa4W2bspEJG6pga9WcBH1eyyTuiiekUVIW8',
                 6: 'llx-ydIQmlGwmwS3De1fVxmnh4hFi4FlOEhPqMXtpetRo75cRAd7',
-                7: 'llx-6JCKqMtIYwut8FwYuBPK0MEMi7ifxCU4njxeswg7CgKFoWav'}
+                7: 'llx-6JCKqMtIYwut8FwYuBPK0MEMi7ifxCU4njxeswg7CgKFoWav',
+                8: 'llx-fVWdsClyJWG8ZhRiiBsECdugttp5J1bFuJNWEftJdo95Wp2m',
+                9: 'llx-qfqlC82bfuXMcfiSYbBsTmgsvJXiqzxi7z6mbTWSB7Yh4tUs',
+                10: 'llx-nCbcZiJR9lnLdmzTu0ZDxtG6ICYl7z4uT4kfLsweZ79a6LHu',
+                11: 'llx-n007Cq3qktZcFazYfJ5AyTm7FPPzPeRsEMv0gtUVnlqtjh3f'}
+
+"""034626"""
 
 
 def main():
@@ -240,7 +248,8 @@ def main():
 
                 for i in range(start, end + 1):
                     code = f'{i:06d}'  # 將數字格式化為六位數
-                    for j in range(1, 5):
+                    nums = [1, 3, 4]
+                    for j in nums:
                         succ = scrape_one_page_retry(code, 3, options[j])
                         if succ:
                             break

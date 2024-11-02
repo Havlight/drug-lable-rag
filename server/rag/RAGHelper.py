@@ -47,7 +47,7 @@ def extract_source(filename):
     parts = re.split(r'[\-]', base_name)
 
     # 過濾掉空字符串
-    parts = [part.strip() for part in parts if part.strip()]
+    parts = [part.strip()[:30] for part in parts if part.strip()]
     return " ".join(parts)
 
 
