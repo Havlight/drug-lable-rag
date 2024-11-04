@@ -42,6 +42,13 @@ there is a test account by default:
 >password:`1111`
 ## configuration
 **there is a chinese version of `.env` if you wanna use**
+**first initialization in `rag/.env`**
+```bash
+vector_store_initial_load=True
+# load data for embedding
+data_directory='rag/data'
+# the path your data should be put
+```
 you can add your api key in `rag/.env`
 ```bash
 GOOGLE_API_KEY=put_your_key-fqxkE4Y
