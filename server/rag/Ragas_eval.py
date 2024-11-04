@@ -24,7 +24,7 @@ os.environ["use_rewrite_loop"] = "False"
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-use_cloud = False
+use_cloud = True
 if os.getenv("use_openai") == "True" or os.getenv("use_gemini") == "True" or os.getenv("use_azure") == "True":
     raghelper = RAGHelperCloud(logger)
     use_cloud = True
