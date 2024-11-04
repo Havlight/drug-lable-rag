@@ -145,4 +145,5 @@ ragas_data = [{
 # Create a Hugging Face Dataset
 dataset = Dataset.from_list(ragas_data)
 dataset.save_to_disk(os.getenv("ragas_dataset"))
+dataset.to_csv(os.getenv("ragas_dataset"))
 # Evaluate
