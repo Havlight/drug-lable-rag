@@ -1,8 +1,19 @@
 The codebase is built on top of the excellent [RAGMEUP](https://github.com/AI-Commandos/RAGMeUp/tree/main).  
-I currently added FastAPI and markdown support. There is more that needs to be added.  
-Also this project will only support postgres
+I changed the backend framework from flask to fastapi and incorporated chromadb
 
-![API endpoints](./endpoints.png)
+![API endpoints](./endpoints.png)  
+# goal of our project
+provide a intelligent QA robot over chinese drug lables  
+which will improve traditional keywords search to a more nature intuitive way of chat
+
+# feature of our project
+- support for user account(using JWT for autentication)
+- using gemini as llm by default but other close llms are also configurable
+- using jina-embedding-v3 to support multilingual by default stil others are configurable
+- using local chroma as our vector database
+- using hybrid search BM25 and mmr
+- swagger docs powered by fastapi
+- rewrite、re2、rerank
 
 # Installation
 
@@ -26,11 +37,18 @@ pip install -r requirements.txt
 ```
 Then run the server using `python main.py` or `fastapi run` from the server subfolder.
 
-there is a test account:  
+there is a test account by default:  
 >username:`user@gmail.com`
 >password:`1111`
 ## configuration
 **there is a chinese version of `.env` if you wanna use**
+**first initialization in `rag/.env`**
+```bash
+vector_store_initial_load=True
+# load data for embedding
+data_directory='rag/data'
+# the path your data should be put
+```
 you can add your api key in `rag/.env`
 ```bash
 GOOGLE_API_KEY=put_your_key-fqxkE4Y
