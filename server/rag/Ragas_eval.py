@@ -15,7 +15,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema.runnable import RunnablePassthrough
 
 from ragas import evaluate
-from ragas.metrics import context_precision, context_recall, faithfulness, answer_relevancy
+from ragas.metrics import context_precision, context_recall, faithfulness, answer_relevancy, answer_correctness
 from ragas.run_config import RunConfig
 
 load_dotenv()
@@ -98,7 +98,7 @@ for i in range(0, ragas_qa_pairs):
         elif 'answer' in response:
             question = response["answer"]
     else:
-        question = response[response.rindex(end_string)+len(end_string):]
+        question = response[response.rindex(end_string) + len(end_string):]
 
     answer_chain = ({"context": RunnablePassthrough(), "question": RunnablePassthrough()} | rag_answer)
     response = answer_chain.invoke({"context": formatted_docs, "question": question})
@@ -110,7 +110,7 @@ for i in range(0, ragas_qa_pairs):
         elif 'answer' in response:
             answer = response["answer"]
     else:
-        answer = response[response.rindex(end_string)+len(end_string):]
+        answer = response[response.rindex(end_string) + len(end_string):]
 
     qa_pairs.append({"question": question, "ground_truth": answer})
 
@@ -127,7 +127,7 @@ for qa_pair in qa_pairs:
         elif 'answer' in response:
             answer = response["answer"]
     else:
-        answer = response['text'][response['text'].rindex(end_string)+len(end_string):]
+        answer = response['text'][response['text'].rindex(end_string) + len(end_string):]
 
     result_dict = qa_pair
     result_dict['answer'] = answer
@@ -146,4 +146,7 @@ ragas_data = [{
 dataset = Dataset.from_list(ragas_data)
 dataset.save_to_disk(os.getenv("ragas_dataset"))
 dataset.to_csv(os.getenv("ragas_dataset"))
+score = evaluate(dataset,
+                 metrics=[context_precision, context_recall, faithfulness, answer_relevancy, answer_correctness])
+score.to_pandas().to_csv(os.getenv("ragas_dataset"))
 # Evaluate
