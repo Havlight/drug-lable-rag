@@ -1,7 +1,7 @@
 The codebase is built on top of the excellent [RAGMEUP](https://github.com/AI-Commandos/RAGMeUp/tree/main).  
 I changed the backend framework from flask to fastapi and incorporated chromadb
 
-![API endpoints](./endpoints.png)  
+![API endpoints](./endpoints2.png)  
 # goal of our project
 provide a intelligent QA robot over chinese drug lables  
 which will improve traditional keywords search to a more nature intuitive way of chat
