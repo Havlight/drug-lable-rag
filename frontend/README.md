@@ -6,3 +6,5 @@
 3.flutter pub upgrade，更新套件  
 這三個沒問題基本上不會有啥事
 然後web要用指令開 : flutter run -d chrome
+
+AndroidManifest.xml的路徑 : "資料夾名稱\android\app\src\main\AndroidManifest.xml"
