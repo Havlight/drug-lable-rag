@@ -31,13 +31,20 @@ import pickle
 
 
 # Make documents look a bit better than default
+# def formatDocuments(docs):
+#     doc_strings = []
+#     for i, doc in enumerate(docs):
+#         metadata_string = ", ".join([f"{md}: {doc.metadata[md]}" for md in doc.metadata.keys()])
+#         doc_strings.append(f"Document {i} content: {doc.page_content}\nDocument {i} metadata: {metadata_string}")
+#     return "\n\n<NEWDOC>\n\n".join(doc_strings)
 def formatDocuments(docs):
     doc_strings = []
     for i, doc in enumerate(docs):
-        metadata_string = ", ".join([f"{md}: {doc.metadata[md]}" for md in doc.metadata.keys()])
-        doc_strings.append(f"Document {i} content: {doc.page_content}\nDocument {i} metadata: {metadata_string}")
+        # metadata_string = ", ".join([f"{md}: {doc.metadata[md]}" for md in doc.metadata.keys()])
+        filename = os.path.basename(doc.metadata['source'])
+        drug_name = filename.split("-")[1]
+        doc_strings.append(f"藥品名:{drug_name} 說明書內容: {doc.page_content}\n藥品名:{drug_name} 文件內容結束")
     return "\n\n<NEWDOC>\n\n".join(doc_strings)
-
 
 def extract_source(filename):
     # 移除路徑和文件擴展名

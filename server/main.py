@@ -18,7 +18,6 @@ from typing import List, Optional, Dict
 if platform.system() == "Linux":
     __import__('pysqlite3')
     import sys
-
     sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 
@@ -36,7 +35,6 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app.add_middleware(TimeoutMiddleware, timeout=120)
-# 頭痛吃什麼藥?
 # Define CORS settings
 origins = ["*"]  # Allow requests from any origin
 
@@ -77,7 +75,7 @@ app.include_router(
 # Disable parallelism in tokenizers to avoid warnings
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-# Load environment variables from .env file
+# Load environment variables from .env.en file
 load_dotenv(dotenv_path="rag/.env")
 
 # Instantiate the RAG Helper class based on the environment configuration
